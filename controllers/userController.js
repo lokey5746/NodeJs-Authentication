@@ -74,4 +74,41 @@ const getUsers = asyncHandler(async (req, res) => {
   });
 });
 
-export { registerUser, loginUser, getUsers };
+// @desc Get Profile
+// @route Get /api/user/profile
+//  @access Private
+
+const getUserProfile = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.userAuth._id).select(
+    "-password -createdAt -updatedAt"
+  );
+  if (!user) {
+    throw new Error("User not found");
+  } else
+    [
+      res.status(200).json({
+        status: "success",
+        data: user,
+        message: "User profile fetch sucessfuly",
+      }),
+    ];
+});
+
+//@desc Get user By ID
+//@route GET /api/users/:id
+//@access Private/Admin
+
+const getUser = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.params.id).select("-password");
+  if (!user) {
+    throw new Error("User not found");
+  } else {
+    res.status(200).json({
+      status: "success",
+      data: user,
+      message: "user found successfully",
+    });
+  }
+});
+
+export { registerUser, loginUser, getUsers, getUserProfile, getUser };
