@@ -2,7 +2,7 @@ import User from "../models/userModel.js";
 import asyncHandler from "express-async-handler";
 import generateToken from "../utilis/generateToken.js";
 
-import { hashPassword } from "../utilis/helpers.js";
+import { hashPassword, verifyPassword } from "../utilis/helpers.js";
 
 // @desc Register user
 // @route Post /api/users
@@ -36,4 +36,26 @@ const registerUser = asyncHandler(async (req, res) => {
   }
 });
 
-export { registerUser };
+const loginUser = asyncHandler(async (req, res) => {
+  const { email, password } = req.body;
+
+  // find user
+
+  const user = await User.findOne({ email });
+  if (!user) {
+    return res.json({ message: "User not exist" });
+  }
+  // verify password
+
+  const isMatched = await verifyPassword(password, user.password);
+  if (!isMatched) {
+    return res.json({ message: "Invalid login" });
+  } else {
+    return res.json({
+      data: generateToken(user._id),
+      message: "Admin logged in successfully",
+    });
+  }
+});
+
+export { registerUser, loginUser };
