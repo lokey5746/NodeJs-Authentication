@@ -2,6 +2,8 @@ import User from "../models/userModel.js";
 import asyncHandler from "express-async-handler";
 import generateToken from "../utilis/generateToken.js";
 
+import { hashPassword } from "../utilis/helpers.js";
+
 // @desc Register user
 // @route Post /api/users
 //  @access Public
@@ -15,7 +17,11 @@ const registerUser = asyncHandler(async (req, res) => {
     res.status(400);
     throw new Error("User already exist");
   }
-  const user = await User.create({ name, email, password });
+  const user = await User.create({
+    name,
+    email,
+    password: await hashPassword(password),
+  });
 
   if (user) {
     res.status(200).json({
