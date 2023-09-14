@@ -36,6 +36,9 @@ const registerUser = asyncHandler(async (req, res) => {
   }
 });
 
+// @desc Login user
+// @route Post /api/users
+//  @access Public
 const loginUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
@@ -53,9 +56,22 @@ const loginUser = asyncHandler(async (req, res) => {
   } else {
     return res.json({
       data: generateToken(user._id),
-      message: "Admin logged in successfully",
+      message: "User logged in successfully",
     });
   }
 });
 
-export { registerUser, loginUser };
+// @desc Get user
+// @route Get /api/users
+//  @access Public
+
+const getUsers = asyncHandler(async (req, res) => {
+  const users = await User.find();
+  res.status(200).json({
+    status: "success",
+    data: users,
+    message: "Users fetched successfully",
+  });
+});
+
+export { registerUser, loginUser, getUsers };
