@@ -166,6 +166,30 @@ const updateUser = asyncHandler(async (req, res) => {
   }
 });
 
+const changePassword = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.userAuth._id);
+  const { oldPassword, password } = req.body;
+  if (!user) {
+    throw new Error("user not found");
+  }
+  if (!oldPassword || !password) {
+    res.status(400);
+    throw new Error("feilds are empty");
+  }
+
+  // check oldPassword With Password in DB
+  const correctPassword = await verifyPassword(oldPassword, password);
+  // save new password
+  if (user && correctPassword) {
+    user.password = password;
+    await user.save();
+    res.status(200).send("password change successfully");
+  } else {
+    res.status(400);
+    throw new Error("old password is incorrect");
+  }
+});
+
 export {
   registerUser,
   loginUser,
@@ -173,4 +197,5 @@ export {
   getUserProfile,
   getUser,
   updateUser,
+  changePassword,
 };
