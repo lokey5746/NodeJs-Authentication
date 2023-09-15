@@ -111,4 +111,66 @@ const getUser = asyncHandler(async (req, res) => {
   }
 });
 
-export { registerUser, loginUser, getUsers, getUserProfile, getUser };
+// @desc  update user
+// @route PUT /api/v1/users/:id
+// @access Private
+
+const updateUser = asyncHandler(async (req, res) => {
+  const { email, name, password } = req.body;
+
+  // check if email is already taken
+  const emailExist = await User.findOne({ email });
+
+  if (emailExist) {
+    throw new Error("email already taken");
+  } else {
+    // check if user update password
+    if (password) {
+      // update with password
+      const user = await User.findByIdAndUpdate(
+        req.userAuth._id,
+        {
+          email,
+          password: await hashPassword(password),
+          name,
+        },
+        {
+          new: true,
+          runValidators: true,
+        }
+      );
+      res.status(200).json({
+        status: "success",
+        data: user,
+        message: "User Update sucessfully",
+      });
+    } else {
+      // update without password
+      const user = await User.findByIdAndUpdate(
+        req.userAuth._id,
+        {
+          email,
+          name,
+        },
+        {
+          new: true,
+          runValidators: true,
+        }
+      );
+      res.status(200).json({
+        status: "success",
+        data: user,
+        message: "User Update sucessfully",
+      });
+    }
+  }
+});
+
+export {
+  registerUser,
+  loginUser,
+  getUsers,
+  getUserProfile,
+  getUser,
+  updateUser,
+};

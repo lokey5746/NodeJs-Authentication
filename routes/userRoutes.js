@@ -7,13 +7,14 @@ import {
   getUsers,
   getUserProfile,
   getUser,
+  updateUser,
 } from "../controllers/userController.js";
 
 const router = express.Router();
 
 router.route("/").post(registerUser).get(protect, getUsers);
 router.route("/login").post(loginUser);
-router.route("/profile").get(protect, getUserProfile);
+router.route("/profile").get(protect, getUserProfile).put(protect, updateUser);
 router.route("/:id").get(protect, getUser);
 
 export default router;
